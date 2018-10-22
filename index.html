@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Analyzing Server-side Blocking at Scale</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<style>
+/* Bootstrap overrides */
+body {
+  /*min-height: 1000px;*/
+  padding-top: 70px;
+}
+
+.navbar-default {
+  height: 65px;
+}
+
+.navbar-default
+.navbar-brand {
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 65px;
+  font-size: 18pt;
+}
+
+.navbar-nav > li > a {
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 65px;
+  font-size: 16pt;
+}
+
+</style>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<!-- Additional files for the Highslide popup effect -->
+<script src="https://www.highcharts.com/media/com_demo/js/highslide-full.min.js"></script>
+<script src="https://www.highcharts.com/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css" />
+
+
+<script>
+	// Get the CSV and create the chart
+	//$.getJSON('based.json', function (chart) {
+	//	Highcharts.chart('plot', chart);
+	//});
+  $.getJSON('corr.json', function (chart) {
+		Highcharts.chart('plotcorr', chart);
+	});
+  $.getJSON('daytoday.json', function (chart) {
+    Highcharts.chart('plotdaytoday', chart);
+	});
+
+</script>
+
+
+</head>
+
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+              <a href="index.html" class="navbar-brand">ServerSide Blocking Study</a>
+          </div>
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse " id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav ">
+                  <li><a href="#about">About</a></li>
+                  <li><a href="#reports">Monthly Reports</a></li>
+                  <li><a href="#download">Downloads</a></li>
+                  <li><a href="#contact">Contact</a></li>
+                  <li><a href="#rpartners">Research Partners</a></li>
+              </ul>
+              <!--<ul class="nav navbar-nav navbar-right">
+                  <li class="mylogo"><a><img src="TU_Muenchen_Logo.svg" height=40px"/></a>&nbsp;</li>
+                  <li class="mylogo"><a><img src="rwth_comsys_bild_rgb.svg" height="40px"/></a>&nbsp;</li>
+                  <li class="mylogo"><a><img src="Usyd_new_logo.png" height="40px"/></a>&nbsp;</li>
+                  <li class="mylogo"><a><img src="neu.png" height="40px"/></a></li>
+              </ul>-->
+              <a href="https://github.com/oftserversideblocking/oftserversideblocking.github.io"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:999;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me (if you wish) on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png""></a>
+          </div>
+          <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+  </nav>
+
+    <div class="container">
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+
+        <div class="page-header">
+
+<h2 id="about">About this Study</h2>
+<p style="font-size: 16px">
+  <br><br>
+While we have a qualitative understanding that the Internet is becoming increasingly balkanized, due to increased data localization laws and breakdowns of safe-harbor agreements, it is difficult to quantify those changes. A data-driven approach is needed to provide a more methodical understanding of the changes that are happening, so that the harms caused by such laws and infringement of agreements can be measured and tracked over time.<br><br>
+
+Moreover, current work to understand nation-state censorship often neglects the existence of server-side blocking. The magnitude of this blocking is unknown, and it is not clear how much this phenomena affects the accuracy of current censorship studies. In this project, we will investigate this issue and help censorship measurement better isolate the effects.<br><br>
+
+In preliminary research, we obtained a virtual private server (VPS) in Iran and manually conducted some initial experiments on server-side blocking to roughly estimate the degree to which it is practiced. Because content distribution services like Akamai and Cloudflare offer the ability to their hosting customers to limit service to end-users based on IP geolocation, we focused on these two prominent CDNs. We first compiled a list of the websites using Akamai in the Alexa Top Million, and then we requested each of these domains from our Iranian server to observe how and to what extent users are denied access to services based on their geographic location.
+
+<br><br>
+Of the 4,111 domains we visited, 255 denied the request entirely by returning an HTTP Status Code 403 Forbidden using Akamai. An additional 72 employed Google’s Recaptcha system, meaning users would be required to pass a reverse Turing test before being served the page. Some additional websites served their own custom denial notification, such as <a href='https://www.airbnb.com/region_unavailable/index.html'> Airbnb</a>. Overall, about 8% of the websites in our sample were unavailable in Iran, not because the Iranian Internet denied access, but because the CDNs or service providers chose to deny service to users in the country. Our initial results confirm that this form of discrimination is complex and significant.
+<br><br>
+<h3> Objectives </h3>
+<br>
+We hope to tackle service-providers’ blocking by systematically investigating the following questions using our project road map:
+<ul>
+<li> <b> Method:</b> How are services blocked or changed by the service operators in ways that deny or degrade access for users in different locations? How can we automatically and systematically detect server-side blocking and differentiate instances of it from transient network failures and from traditional Internet censorship?</li>
+<li> <b>Scale:</b> To what extent are users in particular regions blocked? Which services, or classes of services, are imposing blocking most frequently?</li>
+<li> <b> Motive:</b> Why are services blocking access? What portion of this blocking is due to pressure from repressive governments? Are there better mechanisms for private companies to control access (for purposes such as countering abuse) that have fewer side effects?</li>
+
+</li>
+</ul>  
+<br><br>
+<h2 id="contact">Montly Report</h2>
+<p style="font-size: 16px">
+  <b>TODO montly report here. </b>
+  <ul>
+  <li>July Report</li>
+  <li>August Report</li>
+  <li>September Report</li>
+</ul>  
+</p>
+</p>
+<br>
+<h2 id="download">Paper and Dataset Download</h2>
+<p style="font-size: 16px">
+  TODO: put paper here.
+<br>
+</p>
+
+<p style="font-size: 16px">
+We provide our dataset <a href="http://censoredplanet.com/data">on Github</a>. We provide scripts and a sample of dataset to reproduce our results on our<a href="http://censoredplanet.com/data"> CensoredPlanet's website <a> as well as on <a href="https://github.com/otfserversideblocking/oftserversideblocking.github.io.git"> Github</a>.<br><br>
+Please contact us on the following email for if you intend to use or need help regarding the dataset and scripts. <br /><br>
+</p>
+
+<h2 id="contact">Contact</h2>
+<p style="font-size: 16px">
+	<b>otfserversideblocking</b> [at] <b>gmail.com</b>
+</p>
+
+<h2 id="rpartner">Research Partners</h2>
+<p style="font-size: 16px">
+The research project is funded by generous grant from <a href="https://www.opentech.fund/"> Open Technology Fund (OTF) </a>. 
+<br>
+<br>
+<center>
+  <a href="http://censoredplanet.com">
+      <img src="imgs/censoredplanet_logo.png" width="100" height="100">
+  </a>
+</center>
+
+    </div>  <!-- col -->
+  </div>  <!-- row -->
+
+    </div> <!-- /container -->
+
+</body>
+</html>
